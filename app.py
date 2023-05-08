@@ -9,7 +9,7 @@ import datetime
 import time
 
 
-engine = create_engine('sqlite:///inventory.db', echo=True)
+engine = create_engine('sqlite:///inventory.db', echo=False)
 Session = sessionmaker(bind=engine)
 session = Session()
 Base = declarative_base()
@@ -25,5 +25,15 @@ class Product(Base):
     date_updated =  Column(Date)
 
 
+def organise_csv_data(inventory_file):
+    with open(inventory_file) as csvfile:
+        data = csv.reader(csvfile)
+        for row in data:
+            print(row)
+            
+
 if __name__ == '__main__':
-    Base.metadata.create_all(engine)
+    # Base.metadata.create_all(engine)
+
+    organise_csv_data('inventory.csv')
+    

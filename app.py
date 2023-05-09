@@ -56,7 +56,7 @@ def add_to_db(list_of_dictionaries):
                                   date_updated=item['date_updated'])
             session.add(new_product)
             print('Product added')
-        elif product_in_db.date_updated < item['date_updated']:
+        elif product_in_db.date_updated <= item['date_updated']:
             product_in_db.product_price = item['product_price']
             product_in_db.product_quantity = item['product_quantity']
             product_in_db.date_updated = item['date_updated']
@@ -127,17 +127,18 @@ def view_product():
         prod_ids = str([int(id[0]) for id in prod_ids_tuples])
         print(f'\nProduct IDs: {prod_ids[1:len(prod_ids)-1]}')
         prod_id = input('Please choose a product ID: ')
-        if prod_id in prod_ids:
-            choice_error = False
-        else:
+        try:
+            product = session.query(Product).filter(Product.product_id==int(prod_id)).one()
+        except ValueError:
             print('That is not a valid ID')
             time.sleep(1.2)
-    product = session.query(Product).filter(Product.product_id==int(prod_id)).one()
+        else:
+            choice_error = False
     print(f'''
           \rID: {product.product_id}
           \rProduct: {product.product_name}
           \rQuantity: {product.product_quantity}
-          \rPrice: £{format(product.product_price/100, '.2f')}
+          \rPrice: ${format(product.product_price/100, '.2f')}
           \rUpdated: {datetime.date.strftime(product.date_updated, '%x')}
           \r''')
     input('Press Enter to continue... ')
@@ -177,13 +178,12 @@ def backup_db():
                 name = row.product_name
             price = format(row.product_price/100, '.2f')
             quantity = row.product_quantity
-            # change '%#m/%#d/%Y' to '%-m/%-d/%Y' for UNIX-type platforms
-            date = row.date_updated.strftime('%#m/%#d/%Y')
+            date = row.date_updated.strftime('%m/%d/%Y')
             csvfile.write(f'\n{name},${price},{quantity},{date}')
     input('Backup complete. Press Enter to continue...')
 
 
 if __name__ == '__main__':
     Base.metadata.create_all(engine)
-    create_existing_products_list('inventory_new.csv')
+    create_existing_products_list('inventory.csv')
     menu()

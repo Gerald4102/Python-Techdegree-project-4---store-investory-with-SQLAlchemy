@@ -3,6 +3,7 @@ from sqlalchemy import (create_engine, Column,
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
+
 import csv
 import datetime
 import time
@@ -26,7 +27,9 @@ class Product(Base):
 def create_existing_products_list(inventory_file):
     products = []
     with open(inventory_file) as csvfile:
-        data = iter(csv.reader(csvfile))    # modified from: https://stackoverflow.com/questions/10079216/skip-first-entry-in-for-loop-in-python
+        # next two lines before the for-loop are modified from: 
+        # https://stackoverflow.com/questions/10079216/skip-first-entry-in-for-loop-in-python
+        data = iter(csv.reader(csvfile))
         next(data)
         for row in data:
             product_name = row[0]
@@ -39,6 +42,7 @@ def create_existing_products_list(inventory_file):
                        'date_updated': date_updated}
             products.append(product)
     add_to_db(products)
+
 
 def add_to_db(list_of_dictionaries):
     for item in list_of_dictionaries:
@@ -163,11 +167,20 @@ def add_product():
 
 
 def backup_db():
-    now = datetime.datetime.strftime(datetime.datetime.now(), '%x %X')
-    with open('inventory_new.csv'.format(now), 'a') as csvfile:
+    with open('inventory_new.csv', 'w') as csvfile:
+        csvfile.write('product_name,product_price,product_quantity,date_updated')
         data = session.query(Product).all()
         for row in data:
-            csvfile.write(f'{row.product_name}, {row.product_price}, {row.product_quantity}, {row.date_updated}\n')
+            if ',' in row.product_name:
+                name = '"{}"'.format(row.product_name)
+            else:
+                name = row.product_name
+            price = format(row.product_price/100, '.2f')
+            quantity = row.product_quantity
+            # change '%#m/%#d/%Y' to '%-m/%-d/%Y' for UNIX-type platforms
+            date = row.date_updated.strftime('%#m/%#d/%Y')
+            csvfile.write(f'\n{name},${price},{quantity},{date}')
+
 
 if __name__ == '__main__':
     Base.metadata.create_all(engine)

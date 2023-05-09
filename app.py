@@ -164,10 +164,10 @@ def add_product():
 
 def backup_db():
     now = datetime.datetime.strftime(datetime.datetime.now(), '%x %X')
-    with open(f'inventory {now}.csv', "a") as csvfile:
+    with open('inventory_new.csv'.format(now), 'a') as csvfile:
         data = session.query(Product).all()
         for row in data:
-            print(row[0], row[1], row[2], row[3])
+            csvfile.write(f'{row.product_name}, {row.product_price}, {row.product_quantity}, {row.date_updated}\n')
 
 if __name__ == '__main__':
     Base.metadata.create_all(engine)

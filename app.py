@@ -127,13 +127,17 @@ def view_product():
         prod_ids = str([int(id[0]) for id in prod_ids_tuples])
         print(f'\nProduct IDs: {prod_ids[1:len(prod_ids)-1]}')
         prod_id = input('Please choose a product ID: ')
-        try:
-            product = session.query(Product).filter(Product.product_id==int(prod_id)).one()
-        except ValueError:
+        if prod_id in prod_ids:
+            try:
+                product = session.query(Product).filter(Product.product_id==int(prod_id)).one()
+            except ValueError:
+                print('That is not a valid ID')
+                time.sleep(1.2)
+            else:
+                choice_error = False
+        else:
             print('That is not a valid ID')
             time.sleep(1.2)
-        else:
-            choice_error = False
     print(f'''
           \rID: {product.product_id}
           \rProduct: {product.product_name}

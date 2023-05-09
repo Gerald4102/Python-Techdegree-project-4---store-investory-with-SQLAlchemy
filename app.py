@@ -163,7 +163,7 @@ def add_product():
                'product_quantity': quantity,
                'date_updated': date}]
     add_to_db(product)
-    input('Hit any key ')
+    input('Press Enter to continue... ')
 
 
 def backup_db():
@@ -180,9 +180,10 @@ def backup_db():
             # change '%#m/%#d/%Y' to '%-m/%-d/%Y' for UNIX-type platforms
             date = row.date_updated.strftime('%#m/%#d/%Y')
             csvfile.write(f'\n{name},${price},{quantity},{date}')
+    input('Backup complete. Press Enter to continue...')
 
 
 if __name__ == '__main__':
     Base.metadata.create_all(engine)
-    create_existing_products_list('inventory.csv')
+    create_existing_products_list('inventory_new.csv')
     menu()

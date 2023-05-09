@@ -109,7 +109,7 @@ def menu():
         elif choice == 'a':
             add_product()
         elif choice == 'b':
-            pass
+            backup_db()
         elif choice == 'q':
             menu_running = False
         else:
@@ -160,6 +160,14 @@ def add_product():
                'date_updated': date}]
     add_to_db(product)
     input('Hit any key ')
+
+
+def backup_db():
+    now = datetime.datetime.strftime(datetime.datetime.now(), '%x %X')
+    with open(f'inventory {now}.csv', "a") as csvfile:
+        data = session.query(Product).all()
+        for row in data:
+            print(row[0], row[1], row[2], row[3])
 
 if __name__ == '__main__':
     Base.metadata.create_all(engine)

@@ -168,7 +168,7 @@ def add_product():
 
 
 def backup_db():
-    with open('inventory_new.csv', 'w') as csvfile:
+    with open('backup.csv', 'w') as csvfile:
         csvfile.write('product_name,product_price,product_quantity,date_updated')
         data = session.query(Product).all()
         for row in data:
